@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Fisika & Kimia</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; transition: 0.3s; }
+        .container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: white; transition: 0.3s; }
+        input, select, button { margin: 10px; padding: 10px; width: 80%; border: none; border-radius: 5px; }
+        button { background-color: #007bff; color: white; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #0056b3; }
+        h3 { opacity: 0; transition: opacity 0.5s ease-in-out; }
+        .dark-mode { background-color: #333; color: white; }
+        .dark-mode .container { background-color: #444; color: white; }
+        .logo-container { display: flex; justify-content: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: 80px; transition: 0.3s; mix-blend-mode: multiply; animation: moveSideways 3s infinite alternate ease-in-out; }
+        @keyframes moveSideways {
+            from { transform: translateX(-20px); }
+            to { transform: translateX(20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <h2>Kalkulator Fisika & Kimia</h2>
+        <div class="logo-container">
+            <img src="lupi.png" class="logo" id="logoLuffy">
+        </div>
+        <button onclick="toggleDarkMode()">🌗 Mode Gelap/Terang</button>
+        <select id="kategori" onchange="updateRumus()">
+            <option value="fisika">Fisika</option>
+            <option value="kimia">Kimia</option>
+        </select>
+        <select id="rumus" onchange="generateInputs()"></select>
+        <div id="inputFields"></div>
+        <button onclick="hitung()">Hitung</button>
+        <h3 id="hasil"></h3>
+    </div>
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }const rumusList = {
+        fisika: {
+            "Gaya (N)": ["Massa (kg)", "Percepatan (m/s²)"],
+            "Energi Kinetik (J)": ["Massa (kg)", "Kecepatan (m/s)"],
+            "Tekanan (Pa)": ["Gaya (N)", "Luas (m²)"],
+            "Usaha (J)": ["Gaya (N)", "Jarak (m)"],
+            "Daya (W)": ["Usaha (J)", "Waktu (s)"]
+        },
+        kimia: {
+            "Massa (g)": ["Mol (mol)", "Massa Molar (g/mol)"],
+            "Mol (mol)": ["Massa (g)", "Massa Molar (g/mol)"],
+            "Konsentrasi (mol/L)": ["Mol (mol)", "Volume (L)"],
+            "Hukum Avogadro (L)": ["Mol (mol)"]
+        }
+    };
+
+    function updateRumus() {
+        const kategori = document.getElementById("kategori").value;
+        const rumusSelect = document.getElementById("rumus");
+        rumusSelect.innerHTML = "";
+        for (const rumus in rumusList[kategori]) {
+            const option = document.createElement("option");
+            option.value = rumus;
+            option.textContent = rumus;
+            rumusSelect.appendChild(option);
+        }
+        generateInputs();
+    }
+
+    function generateInputs() {
+        const kategori = document.getElementById("kategori").value;
+        const rumus = document.getElementById("rumus").value;
+        const inputFields = document.getElementById("inputFields");
+        inputFields.innerHTML = "";
+        rumusList[kategori][rumus].forEach(label => {
+            const input = document.createElement("input");
+            input.type = "number";
+            input.placeholder = label;
+            input.setAttribute("data-label", label);
+            inputFields.appendChild(input);
+        });
+    }
+
+    function hitung() {
+        const kategori = document.getElementById("kategori").value;
+        const rumus = document.getElementById("rumus").value;
+        const inputs = document.querySelectorAll("#inputFields input");
+        let values = Array.from(inputs).map(input => parseFloat(input.value) || 0);
+        let hasil = 0;
+        if (kategori === "fisika") {
+            if (rumus.includes("Gaya")) hasil = values[0] * values[1];
+            else if (rumus.includes("Energi Kinetik")) hasil = 0.5 * values[0] * values[1] ** 2;
+            else if (rumus.includes("Tekanan")) hasil = values[0] / values[1];
+            else if (rumus.includes("Usaha")) hasil = values[0] * values[1];
+            else if (rumus.includes("Daya")) hasil = values[0] / values[1];
+        } else if (kategori === "kimia") {
+            if (rumus.includes("Massa")) hasil = values[0] * values[1];
+            else if (rumus.includes("Mol")) hasil = values[0] / values[1];
+            else if (rumus.includes("Konsentrasi")) hasil = values[0] / values[1];
+            else if (rumus.includes("Hukum Avogadro")) hasil = values[0] * 22.4;
+        }
+        let hasilElement = document.getElementById("hasil");
+        hasilElement.textContent = `Hasil: ${hasil.toFixed(2)} ${rumus.split("(")[1].split(")")[0]}`;
+        hasilElement.style.opacity = 1;
+    }
+
+    updateRumus();
+</script>
+
+</body>
+</html>
